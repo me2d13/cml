@@ -2,16 +2,18 @@ import config
 import log
 import paho.mqtt.client as mqtt
 import re
+import traceback
 
 logger = log.create_logger(__name__)
 
 client = None
 
 class MqttClient:
-    def __init__(self):
+    def __init__(self, broker):
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
+        self.broker = broker
 
     def init(self):
         self.topic_pattern = re.compile("{}/([0-9]+)".format(config.MQTT_ROOT), re.IGNORECASE)
@@ -31,7 +33,11 @@ class MqttClient:
         match = self.topic_pattern.match(msg.topic)
         if match:
             command = match.group(1)
-            logger.debug("Recognized command %d", command)
+            logger.debug("Recognized command %s", command)
+            try:
+                self.broker.on_command(command)
+            except:
+                traceback.print_exc()
         else:
             logger.warning("Unexpected topic {}, cannot be parsed".format(msg.topic))
 
