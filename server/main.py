@@ -4,6 +4,7 @@ import log
 import time 
 import mqtt 
 import broker
+import httpd
 
 # py -m pip install paho-mqtt
 
@@ -20,6 +21,8 @@ def main():
 
     command_broker.init_commands(client)
     command_broker.describe_commands()
+
+    httpd.start_httpd(command_broker)
 
     try:
         while True:

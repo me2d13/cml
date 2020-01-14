@@ -26,3 +26,18 @@ class CmlAbstractCommand:
         interrupt_event = threading.Event()
         thread = threading.Thread(target=self.run_wrapper, args=(interrupt_event,), daemon=True)
         return (thread, interrupt_event)
+
+    def light_on(self, dp_no):
+        topic = '/xcfgw/lr/command/{}'.format(dp_no)
+        payload = '{"event": 10, "data":1}'
+        self.mqtt_client.publish(topic, payload)
+
+    def light_off(self, dp_no):
+        topic = '/xcfgw/lr/command/{}'.format(dp_no)
+        payload = '{"event": 10, "data":0}'
+        self.mqtt_client.publish(topic, payload)
+
+    def light_pct(self, dp_no, percent):
+        topic = '/xcfgw/lr/command/{}'.format(dp_no)
+        payload = '{"event": 13, "data":64, "percent": %d}' % percent
+        self.mqtt_client.publish(topic, payload)        

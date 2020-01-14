@@ -33,7 +33,7 @@ class MqttClient:
         match = self.topic_pattern.match(msg.topic)
         if match:
             command = match.group(1)
-            logger.debug("Recognized command %s", command)
+            logger.debug("Recognized mqtt command %s", command)
             try:
                 self.broker.on_command(command)
             except:
