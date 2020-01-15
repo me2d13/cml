@@ -1,0 +1,35 @@
+.App {
+  max-width: 600px;
+  margin: 2px;
+}
+
+.Keypad {
+  text-align: center;
+  display: grid;
+  grid-template-columns: 32% 32% 32%;
+}
+
+.Button {
+  border: 2px solid #1C6EA4;
+  margin: 5px;
+  min-height: 80px;
+  cursor: pointer;
+  background-color: beige;
+}
+
+.keyText {
+  font-size: 40px;
+}
+
+.display {
+  border: 1px solid green;
+  min-height: 80px;
+  background-color: black;
+  color: aquamarine;
+  font-size: 50px;
+}
+
+.legend {
+  color: gray;
+  margin-left: 10px;
+}
