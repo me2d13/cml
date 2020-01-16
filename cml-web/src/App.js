@@ -13,6 +13,7 @@ const Button = props => (
 
 function App() {
   const [value, setValue] = React.useState('');
+  const [help, setHelp] = React.useState(null);
   const addNumber = num => () => {
     setValue(val => `${val}${num}`);
   };
@@ -20,6 +21,16 @@ function App() {
     fetch(`${BASE_URL}/cmd/${value}`, {method: 'POST'});
     setValue('');
   };
+
+  React.useEffect(() => {
+    fetch(`${BASE_URL}/help`, {method: 'GET'})
+    .then(response => {
+      console.log(response);
+      if (response.ok) {
+        response.text().then(body => setHelp(body));
+      }
+    });
+  }, []);
   
   return (
     <div className="App">
@@ -38,7 +49,7 @@ function App() {
         <Button onClick={addNumber(0)} text={0} />
         <Button onClick={submit} text={"↵"} />
       </div>
-      <pre className="legend">TODO: describe commands</pre>
+      <pre className="legend">{help}</pre>
     </div>
   );
 }

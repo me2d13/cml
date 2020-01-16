@@ -16,8 +16,9 @@ class Broker:
 
     def describe_commands(self):
         res = ''
-        for command in commands.commands.values():
-            res += command.describe() + "\n"
+        int_commands = sorted([int(k) for k in commands.commands.keys()])
+        for key in int_commands:
+            res += commands.commands.get(f'{key}').describe() + "\n"
         return res
     
     def on_command_end(self, command_key):

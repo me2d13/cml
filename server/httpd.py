@@ -42,6 +42,7 @@ def make_handler(broker):
             if self.path == '/help':
                 self.send_response(200)
                 self.send_header("Content-type", "text/plain")
+                self.send_header("Access-Control-Allow-Origin", "*")
                 self.end_headers()
                 self.wfile.write(bytes(broker.describe_commands(), "utf8"))
             else:
