@@ -20,7 +20,7 @@ def main():
     client.init()
 
     command_broker.init_commands(client)
-    command_broker.describe_commands()
+    logger.info("\nAvailable commands:\n===================\n{}".format(command_broker.describe_commands()))
 
     httpd.start_httpd(command_broker)
 

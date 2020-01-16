@@ -15,11 +15,10 @@ class Broker:
             command.init(mqtt_client, log.create_logger('command_{}'.format(key)), self.on_command_end)
 
     def describe_commands(self):
-        logger.info('Available commands')
-        logger.info('==================')
+        res = ''
         for command in commands.commands.values():
-            logger.info(command.describe())
-        logger.info('99: cancel all running commands')
+            res += command.describe() + "\n"
+        return res
     
     def on_command_end(self, command_key):
         logger.debug('Command %s ended', command_key)
