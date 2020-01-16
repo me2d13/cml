@@ -37,6 +37,18 @@ def make_handler(broker):
             html = f"<html><head></head><body>{result}</body></html>"
             self.wfile.write(bytes(html, "utf8"))
             return
+
+        def do_GET(self):
+            if self.path == '/help':
+                self.send_response(200)
+                self.send_header("Content-type", "text/plain")
+                self.end_headers()
+                self.wfile.write(bytes(broker.describe_commands(), "utf8"))
+            else:
+                self.send_response(404)
+            return
+
+
     return MyHttpRequestHandler
 
 def start_httpd(broker):
