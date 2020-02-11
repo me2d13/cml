@@ -6,10 +6,18 @@ Suppose you can control lights, heating, jalousies by mqtt messages. Then you ca
 So with these tools you can for example define command number 13 which opens garage doors, waits 2 minutes and then closes the doors. Such command can be entered from web page, mobile phone or hw gadget.
 
 # Components
-* __server__ python program which
-  * defines the commands (using delays, threading, mqtt library and whatever you need)
-  * has some coordination logic to detect and execute those commands. Coordinates threads for running commands (with delays)
-  * has build in http server to receive inputs from web/android app
+* __server__ python program which with 3 main components
+  * mqtt gateway
+    * defines the commands (using delays, threading, mqtt library and whatever you need)
+    * has some coordination logic to detect and execute those commands. Coordinates threads for running commands (with delays)
+  * internal web server
+    * backend for _cml-web_
+    * listen POSTs on /cmd/-number-
+    * has admin API for _cml-mobile_ client, to GET current/pending clients, approve client, limit their commands
+  * external web server
+    * runs at different port so can be externally available using port forwarding
+    * backend for cml-mobile
+    * accepts link requests and commands with signed JWTs
 * __cml-web__ is very simple react application which displays keypad to enter numeric commands. This application is intended to run at internal network only. Making it available for public internet would require additional authentication which I'm too lazy to implement (as I don't need it)
 * __cml-mobile__ android application which displays keypad to enter the commands. Here the extended authentication is in place. The android app uses JWT to authenticate itself and as such need to be registered as client for server. Server keeps track of known clients. _NOT IMPLEMENTED YET_
 * __cml-keypad__ code for Wemos D1 (ESP8266) with simple matrix keyboard. Intended to be connected to you local wifi and mounted to wall at your home or used as battery powered device. _NOT IMPLEMENTED YET_
