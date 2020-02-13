@@ -19,7 +19,8 @@ class KeypadFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        viewModel = ViewModelProvider(this).get(CmlViewModel::class.java)
+        val viewModelFactory = CmlViewModelFactory(activity!!.application)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(CmlViewModel::class.java)
         binding = FragmentKeypadBinding.inflate(inflater)
         // Inflate the layout for this fragment
         return binding.root
