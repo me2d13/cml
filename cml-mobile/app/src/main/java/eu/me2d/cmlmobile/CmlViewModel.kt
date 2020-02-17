@@ -48,7 +48,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
             val decodedKey = Base64.getDecoder().decode(privateKeyString)
             privateKey = SecretKeySpec(decodedKey, "RSA")
         }
-        if (!url.value.isNullOrEmpty()) {
+        if (!url.value.isNullOrEmpty() && privateKey != null) {
             apiService = ApiService(url.value!!, privateKey!!)
         }
     }
