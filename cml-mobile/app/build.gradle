@@ -3,6 +3,10 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
+    compileOptions {
+        targetCompatibility = "8"
+        sourceCompatibility = "8"
+    }
     compileSdkVersion 28
     defaultConfig {
         applicationId "eu.me2d.cmlmobile"
@@ -46,6 +50,8 @@ dependencies {
     }
     implementation "android.arch.navigation:navigation-fragment-ktx:$version_navigation"
     implementation "android.arch.navigation:navigation-ui-ktx:$version_navigation"
+    implementation "com.squareup.retrofit2:retrofit:$version_retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$version_retrofit"
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.takisoft.fix:preference-v7:25.3.0.0'
     testImplementation 'junit:junit:4.12'

@@ -25,13 +25,38 @@
             android:layout_width="match_parent"
             android:layout_height="45dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
             android:text="@={viewModel.url}"
-            app:layout_constraintBottom_toTopOf="@+id/sentNoteTextView"
+            app:layout_constraintBottom_toTopOf="@+id/noteTextView"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/urlTextView" />
+
+        <TextView
+            android:id="@+id/noteTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="@string/note"
+            app:layout_constraintBottom_toTopOf="@+id/noteEditText"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/urlEditText"
+            app:layout_constraintVertical_chainStyle="packed" />
+
+        <EditText
+            android:id="@+id/noteEditText"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:text="@={viewModel.note}"
+            app:layout_constraintBottom_toTopOf="@+id/sentNoteTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/noteTextView" />
 
         <TextView
             android:id="@+id/sentNoteTextView"
@@ -42,21 +67,35 @@
             android:layout_marginEnd="16dp"
             android:text="@{viewModel.sentDateString}"
             android:textAlignment="center"
+            app:layout_constraintBottom_toTopOf="@+id/sentResultTextView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/noteEditText" />
+
+        <TextView
+            android:id="@+id/sentResultTextView"
+            android:layout_width="match_parent"
+            android:layout_height="19dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:text="@{viewModel.sentResult}"
+            android:textAlignment="center"
             app:layout_constraintBottom_toTopOf="@+id/sendButton"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/urlEditText" />
+            app:layout_constraintTop_toBottomOf="@+id/sentNoteTextView" />
 
         <Button
             android:id="@+id/sendButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
             android:text="@string/send"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sentNoteTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/sentResultTextView" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

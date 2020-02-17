@@ -1,6 +1,7 @@
 package eu.me2d.cmlmobile
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
@@ -11,7 +12,7 @@ import eu.me2d.cmlmobile.databinding.FragmentKeypadBinding
 
 
 class KeypadFragment : Fragment() {
-    private lateinit var viewModel: CmlViewModel
+    private lateinit var vm: CmlViewModel
     private lateinit var binding: FragmentKeypadBinding
 
     override fun onCreateView(
@@ -20,9 +21,11 @@ class KeypadFragment : Fragment() {
     ): View? {
         setHasOptionsMenu(true)
         val viewModelFactory = CmlViewModelFactory(activity!!.application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(CmlViewModel::class.java)
+        vm = ViewModelProvider(this, viewModelFactory).get(CmlViewModel::class.java)
         binding = FragmentKeypadBinding.inflate(inflater)
         // Inflate the layout for this fragment
+        binding.viewModel = vm
+        binding.lifecycleOwner = this
         return binding.root
     }
 
@@ -41,6 +44,8 @@ class KeypadFragment : Fragment() {
             b0.setOnClickListener { v -> onClick(v) }
             bc.setOnClickListener { input.text = "" }
             be.setOnClickListener { onEnterPressed() }
+            floatingActionButton.setOnClickListener { vm.fetchCommands() }
+            commandsTextView.movementMethod = ScrollingMovementMethod();
         }
     }
 
