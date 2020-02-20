@@ -4,55 +4,69 @@ import re
 import config
 import log
 import traceback
-
+import cherrypy
+from cherrypy._cpserver import Server
 
 logger = log.create_logger(__name__)
 
-def make_handler(broker):
-    class MyHttpRequestHandler(http.server.BaseHTTPRequestHandler):
-        def do_POST(self):
-            path_pattern = re.compile("/cmd/([0-9]+)", re.IGNORECASE)
-            # Sending an '200 OK' response
-            self.send_response(200)
+@cherrypy.expose
+class CommandsApi(object):
+    def __init__(self, broker):
+        self.broker = broker
 
-            # Setting the header
-            self.send_header("Content-type", "text/html")
+    @cherrypy.tools.json_out()
+    def GET(self):
+        logger.debug("Parse port from %s", cherrypy.request.base)
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+        return self.broker.get_commands()
 
-            # Whenever using 'send_header', you also have to call 'end_headers'
-            self.end_headers()
+    @cherrypy.tools.json_out()
+    def POST(self, number):
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+        path_pattern = re.compile("([0-9]+)")
+        match = path_pattern.match(number)
+        if match:
+            command = match.group(1)
+            logger.debug("Recognized httpd command %s", command)
+            try:
+                logger.debug("Executing command %s", command)
+                self.broker.on_command(command)
+                result = 'Command executed'
+            except:
+                traceback.print_exc()
+                result = 'Command recognized but failed'
+        else:
+            logger.warning("Command number can be number only")
+            result = 'Unsupported command number'
+        return {'message': result}
 
-            match = path_pattern.match(self.path)
-            if match:
-                command = match.group(1)
-                logger.debug("Recognized httpd command %s", command)
-                try:
-                    broker.on_command(command)
-                    result = 'Command executed'
-                except:
-                    traceback.print_exc()
-                    result = 'Command recognized but failed'
-            else:
-                logger.warning("Unexpected path {}, cannot be parsed".format(self.path))
-                result = 'Unsupported path, provide /cmd/number'
-            html = f"<html><head></head><body>{result}</body></html>"
-            self.wfile.write(bytes(html, "utf8"))
-            return
+    def _cp_dispatch(self, vpath):
+        if len(vpath) == 1:
+            cherrypy.request.params['number'] = vpath.pop()
+            return self
+        return vpath
 
-        def do_GET(self):
-            if self.path == '/help':
-                self.send_response(200)
-                self.send_header("Content-type", "text/plain")
-                self.send_header("Access-Control-Allow-Origin", "*")
-                self.end_headers()
-                self.wfile.write(bytes(broker.describe_commands(), "utf8"))
-            else:
-                self.send_response(404)
-            return
+@cherrypy.expose
+class ClientsApi(object):
+    @cherrypy.tools.json_out()
+    def POST(self):
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+        logger.debug("I see client request")
+        return {'status': 'ok'}
 
 
-    return MyHttpRequestHandler
+conf = {
+        '/': {'request.dispatch':  cherrypy.dispatch.MethodDispatcher(),
+                 'tools.sessions.on': False,
+                 'tools.response_headers.on': True,
+                 'tools.response_headers.headers': [('Content-Type', 'application/json')]}
+            }
 
-def start_httpd(broker):
-    with socketserver.TCPServer(("", config.HTTPD_PORT), make_handler(broker)) as httpd:
-        logger.debug("Server started at localhost:" + str(config.HTTPD_PORT))
-        httpd.serve_forever()
+def start_httpd(broker, client):
+    cherrypy.tree.mount(CommandsApi(broker), '/commands', conf)
+    server = Server()
+    server.socket_port = 8090
+    server.subscribe()
+    cherrypy.tree.mount(ClientsApi(), '/clients', conf)
+    cherrypy.engine.start()
+    cherrypy.engine.block()

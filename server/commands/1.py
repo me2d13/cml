@@ -2,7 +2,7 @@ from .abstract_command import CmlAbstractCommand
 
 class CmlCommand(CmlAbstractCommand):
     def describe(self):
-        return '{}: blik v pracovne 1 minuta'.format(self.command_number)
+        return 'blik v pracovne 1 minuta'
 
     def run(self, interrupt_event):
         self.light_on(47)

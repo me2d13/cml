@@ -2,7 +2,7 @@ from .abstract_command import CmlAbstractCommand
 
 class CmlCommand(CmlAbstractCommand):
     def describe(self):
-        return '{}: vypnout pracovnu za 1 minutu'.format(self.command_number)
+        return 'vypnout pracovnu za 1 minutu'
 
     def run(self, interrupt_event):
         self.light_pct(47, 50)

@@ -18,9 +18,16 @@ class Broker:
         res = ''
         int_commands = sorted([int(k) for k in commands.commands.keys()])
         for key in int_commands:
-            res += commands.commands.get(f'{key}').describe() + "\n"
+            res += "{}: {}\n".format(key, commands.commands.get(f'{key}').describe())
         return res
-    
+
+    def get_commands(self):
+        res = []
+        int_commands = sorted([int(k) for k in commands.commands.keys()])
+        for key in int_commands:
+            res.append({'number': key, 'description': commands.commands.get(f'{key}').describe()})
+        return res
+
     def on_command_end(self, command_key):
         logger.debug('Command %s ended', command_key)
         del self.thread_pool[command_key]

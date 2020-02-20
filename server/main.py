@@ -7,6 +7,7 @@ import broker
 import httpd
 
 # py -m pip install paho-mqtt
+# pip install cherrypy
 
 
 logger = log.create_logger(__name__)
@@ -22,15 +23,7 @@ def main():
     command_broker.init_commands(client)
     logger.info("\nAvailable commands:\n===================\n{}".format(command_broker.describe_commands()))
 
-    httpd.start_httpd(command_broker)
-
-    try:
-        while True:
-            #print("Tick")
-            #tick()
-            time.sleep(1)
-    except KeyboardInterrupt:
-        logger.debug("Breaking the loop on ctrl+c")
+    httpd.start_httpd(command_broker, client)
 
     logger.info('Cleanup...')
     client.cleanup()
