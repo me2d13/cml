@@ -8,6 +8,8 @@ import httpd
 
 # py -m pip install paho-mqtt
 # pip install cherrypy
+# pip install PyJWT
+# pip install pyjwt[crypto]
 
 
 logger = log.create_logger(__name__)
