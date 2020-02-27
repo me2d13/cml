@@ -55,8 +55,9 @@ class KeypadFragment : Fragment() {
     }
 
 
-    fun onEnterPressed() {
-
+    private fun onEnterPressed() {
+        vm.executeCommand(Integer.parseInt(binding.input.text.toString()))
+        binding.input.text = ""
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

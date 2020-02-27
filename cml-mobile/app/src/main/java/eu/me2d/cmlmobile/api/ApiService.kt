@@ -102,4 +102,26 @@ class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
             }
         })
     }
+
+    fun executeCommand(number: Number) {
+        val jws = Jwts.builder()
+            .setSubject("Command")
+            .setId(Date().time.toString())
+            .signWith(privateKey)
+            .compact()
+        val call = retrofitService.executeCommand("Bearer $jws", number)
+        call.enqueue(object : Callback<Void> {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                Timber.e(t, "Api error")
+            }
+
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if (response.isSuccessful) {
+                    Timber.d("Executed command %d", number.toInt())
+                } else {
+                    Timber.e("${response.code()} ${response.message()}")
+                }
+            }
+        })
+    }
 }

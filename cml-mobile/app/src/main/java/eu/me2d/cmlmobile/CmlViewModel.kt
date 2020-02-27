@@ -83,7 +83,15 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun haveInfoForApiCalls(): Boolean {
+    fun executeCommand(number: Number) {
+        if (haveInfoForApiCalls()) {
+            apiService?.executeCommand(number)
+        } else {
+            Timber.w("Can't execute command, register client first")
+        }
+    }
+
+    private fun haveInfoForApiCalls(): Boolean {
         return !url.value.isNullOrEmpty() && sentDate.value != null && privateKey != null
     }
 
