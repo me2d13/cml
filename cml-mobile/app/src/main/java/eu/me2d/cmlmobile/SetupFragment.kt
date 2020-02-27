@@ -32,7 +32,7 @@ class SetupFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.sendButton.setOnClickListener {viewModel.onSendRequest()}
+        binding.sendButton.setOnClickListener {viewModel.sendRegisterClientRequest()}
     }
 
 

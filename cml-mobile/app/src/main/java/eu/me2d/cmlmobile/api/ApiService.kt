@@ -2,32 +2,27 @@ package eu.me2d.cmlmobile.api
 
 import androidx.lifecycle.MutableLiveData
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.security.Keys
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
-import java.security.Key
-import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
-import java.security.spec.PKCS8EncodedKeySpec
 import java.util.*
-import javax.crypto.SecretKey
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
+import javax.net.ssl.*
 
 
-class ApiService(baseUrl: String, private val privateKey: Key) {
+//TODO: convert to Dagger singleton
+class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
     private val retrofitService = Retrofit.Builder()
         .baseUrl(baseUrl)
         .addConverterFactory(GsonConverterFactory.create())
-        .client(unSafeOkHttpClient().build())
+        .client(unSafeOkHttpClient().addInterceptor(HttpLoggingInterceptor()).build())
         .build()
         .create(ApiRetrofitService::class.java)
 
@@ -74,7 +69,7 @@ class ApiService(baseUrl: String, private val privateKey: Key) {
             val sslSocketFactory = sslContext.socketFactory
             if (trustAllCerts.isNotEmpty() &&  trustAllCerts.first() is X509TrustManager) {
                 okHttpClient.sslSocketFactory(sslSocketFactory, trustAllCerts.first() as X509TrustManager)
-                okHttpClient.hostnameVerifier { _, _ -> true }
+                okHttpClient.hostnameVerifier(HostnameVerifier() { _, _ -> true})
             }
 
             return okHttpClient
@@ -84,8 +79,6 @@ class ApiService(baseUrl: String, private val privateKey: Key) {
     }
 
     fun fetchCommands(commands: MutableLiveData<List<Command>>) {
-        val kf: KeyFactory = KeyFactory.getInstance("RSA")
-        val privateKey: PrivateKey = kf.generatePrivate(PKCS8EncodedKeySpec(privateKey.encoded))
         val jws = Jwts.builder()
             .setSubject("Commands")
             .setId(Date().time.toString())

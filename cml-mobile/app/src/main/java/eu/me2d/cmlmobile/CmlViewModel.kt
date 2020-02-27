@@ -1,20 +1,18 @@
 package eu.me2d.cmlmobile
 
 import android.app.Application
+import android.util.Base64
 import androidx.lifecycle.*
 import androidx.preference.PreferenceManager
 import eu.me2d.cmlmobile.api.ApiService
 import eu.me2d.cmlmobile.api.Command
+import org.threeten.bp.LocalDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
 import timber.log.Timber
-import java.security.Key
-import java.security.KeyPair
-import java.security.KeyPairGenerator
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.*
+import java.security.*
+import java.security.spec.PKCS8EncodedKeySpec
 import java.util.stream.Collectors
-import javax.crypto.spec.SecretKeySpec
 
 class CmlViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -28,7 +26,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
     val note: MutableLiveData<String> = MutableLiveData("")
     private val sentDate: MutableLiveData<LocalDateTime>
     val sentDateString: LiveData<String>
-    private var privateKey: Key? = null
+    private var privateKey: PrivateKey? = null
     private var apiService: ApiService? = null
     val sentResult: MutableLiveData<String> = MutableLiveData()
     private val commands: MutableLiveData<List<Command>> = MutableLiveData()
@@ -40,13 +38,17 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
         url = MutableLiveData(sharedPrefs.getString(KEY_SERVER_URL, "https://"))
         val sendDateString = sharedPrefs.getString(KEY_SENT_DATE, null)
         sentDate = MutableLiveData<LocalDateTime>(if (sendDateString == null) null else LocalDateTime.parse(sendDateString))
-        sentDateString = Transformations.map(sentDate) {it?.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT)) ?: "Not yet sent"}
+        sentDateString = Transformations.map(sentDate) {it?.format(
+            DateTimeFormatter.ofLocalizedDateTime(
+            FormatStyle.SHORT)) ?: "Not yet sent"}
         commandsString = Transformations.map(commands) {it.stream().map { c -> "%2d: %s".format(c.number, c.description) }
             .collect(Collectors.joining("\n"))}
         val privateKeyString = sharedPrefs.getString(KEY_PRIVATE_KEY, null)
+        //Timber.i("Private key from shared prefs is %s", privateKeyString)
         if (privateKeyString != null) {
-            val decodedKey = Base64.getDecoder().decode(privateKeyString)
-            privateKey = SecretKeySpec(decodedKey, "RSA")
+            val decodedKey = Base64.decode(privateKeyString, Base64.DEFAULT)
+            val kf: KeyFactory = KeyFactory.getInstance("RSA")
+            privateKey = kf.generatePrivate(PKCS8EncodedKeySpec(decodedKey))
         }
         if (!url.value.isNullOrEmpty() && privateKey != null) {
             apiService = ApiService(url.value!!, privateKey!!)
@@ -54,17 +56,17 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun onSendRequest() {
+    fun sendRegisterClientRequest() {
         val kpg: KeyPairGenerator = KeyPairGenerator.getInstance("RSA")
         kpg.initialize(2048)
         val kp: KeyPair = kpg.generateKeyPair()
         privateKey = kp.private
         val pub: Key = kp.public
-        val encoder: Base64.Encoder = Base64.getEncoder()
-        val publicKey = encoder.encodeToString(pub.encoded)
-        val publicKeyStr = "-----BEGIN RSA PUBLIC KEY-----\n${publicKey}\n-----END RSA PUBLIC KEY-----\n"
+        val publicKey = Base64.encodeToString(pub.encoded, Base64.DEFAULT)
+        val publicKeyStr = "-----BEGIN PUBLIC KEY-----\n${publicKey}-----END PUBLIC KEY-----\n"
         Timber.i("Sending request to %s", url.value)
         Timber.i("Public key is %s", publicKeyStr)
+        Timber.i("Private key is %s", Base64.encodeToString(privateKey!!.encoded, Base64.DEFAULT))
         sentDate.value = LocalDateTime.now()
         saveToSharedPrefs()
         if (url.value != null && privateKey != null) {
@@ -93,7 +95,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
                 putString(KEY_SENT_DATE, sentDate.value.toString())
             }
             if (privateKey != null) {
-                putString(KEY_PRIVATE_KEY, Base64.getEncoder().encodeToString(privateKey!!.encoded))
+                putString(KEY_PRIVATE_KEY, Base64.encodeToString(privateKey!!.encoded, Base64.DEFAULT))
             }
             commit()
         }
