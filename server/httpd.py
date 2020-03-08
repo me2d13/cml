@@ -3,6 +3,7 @@ import socketserver
 import re
 import config
 import log
+import logging
 import traceback
 import cherrypy
 import clients

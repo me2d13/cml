@@ -20,7 +20,7 @@ import javax.net.ssl.*
 //TODO: convert to Dagger singleton
 class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
     private val retrofitService = Retrofit.Builder()
-        .baseUrl(baseUrl)
+        .baseUrl(if (baseUrl.endsWith('/')) baseUrl else "$baseUrl/")
         .addConverterFactory(GsonConverterFactory.create())
         .client(unSafeOkHttpClient().addInterceptor(HttpLoggingInterceptor()).build())
         .build()

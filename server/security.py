@@ -11,8 +11,14 @@ class Security:
     def __init__(self):
         self.last_jtis = {} # dictionary client id => last used jti. Maybe convert to list to be more secure
 
+    def is_public_access(self, request):
+        logger.debug("Access from request.base %s with headers %s", request.base, request.headers)
+        on_port = request.base.endswith(str(config.HTTPD_PUBLIC_PORT))
+        on_custom_heaer = request.headers.get('X-Cml-Public') == "True"
+        return on_port or on_custom_heaer
+
     def find_client(self, request):
-        if request.base.endswith(str(config.HTTPD_PUBLIC_PORT)):
+        if self.is_public_access(request):
             logger.debug("Public access detected, checking jwt")
             token = request.headers.get('AUTHORIZATION')
             if not token:
