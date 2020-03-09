@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cml mobile</string>
+    <string name="action_settings">Nastavení</string>
+    <string name="pref_server">Server</string>
+    <string name="setup">Nastavení</string>
+    <string name="server_url">Url adresa serveru</string>
+    <string name="not_yet_sent">Zatím neodesláno</string>
+    <string name="send">Odeslat</string>
+    <string name="note">Poznámka (kdo jsem)</string>
+    <string name="not_yet_approved">Přístup zatím nebyl schválen</string>
+</resources>

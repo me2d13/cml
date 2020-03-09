@@ -31,6 +31,8 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
     val sentResult: MutableLiveData<String> = MutableLiveData()
     private val commands: MutableLiveData<List<Command>> = MutableLiveData()
     val commandsString: LiveData<String>
+    val paired: LiveData<Boolean>
+    val toastCode: MutableLiveData<Int> = MutableLiveData()
 
     init {
         Timber.d("Reading state from shared props")
@@ -53,6 +55,9 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
         if (!url.value.isNullOrEmpty() && privateKey != null) {
             apiService = ApiService(url.value!!, privateKey!!)
         }
+        paired = MediatorLiveData<Boolean>()
+        paired.addSource(url) { paired.value = haveInfoForApiCalls() }
+        paired.addSource(sentDate) { paired.value = haveInfoForApiCalls() }
     }
 
 
@@ -77,7 +82,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
 
     fun fetchCommands() {
         if (haveInfoForApiCalls()) {
-            apiService?.fetchCommands(commands)
+            apiService?.fetchCommands(commands, toastCode)
         } else {
             Timber.w("Can't fetch commands, register client first")
         }

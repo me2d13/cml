@@ -5,14 +5,20 @@ import android.text.method.ScrollingMovementMethod
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.Button
-import androidx.lifecycle.ViewModelProvider
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.databinding.BindingAdapter
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import eu.me2d.cmlmobile.databinding.FragmentKeypadBinding
 
 
 class KeypadFragment : Fragment() {
-    private lateinit var vm: CmlViewModel
+    private val vm: CmlViewModel by activityViewModels()
     private lateinit var binding: FragmentKeypadBinding
 
     override fun onCreateView(
@@ -20,28 +26,33 @@ class KeypadFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         setHasOptionsMenu(true)
-        val viewModelFactory = CmlViewModelFactory(activity!!.application)
-        vm = ViewModelProvider(this, viewModelFactory).get(CmlViewModel::class.java)
         binding = FragmentKeypadBinding.inflate(inflater)
         // Inflate the layout for this fragment
         binding.viewModel = vm
         binding.lifecycleOwner = this
+        vm.toastCode.observe(viewLifecycleOwner, Observer<Int> {
+            if (it == 403) {
+                Toast.makeText(this.context, R.string.not_yet_approved, Toast.LENGTH_SHORT).show()
+            } else if ( it != 200) {
+                Toast.makeText(this.context, it.toString(), Toast.LENGTH_SHORT).show()
+            }
+        })
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.apply {
             input.text = ""
-            b1.setOnClickListener { v -> onClick(v) }
-            b2.setOnClickListener { v -> onClick(v) }
-            b3.setOnClickListener { v -> onClick(v) }
-            b4.setOnClickListener { v -> onClick(v) }
-            b5.setOnClickListener { v -> onClick(v) }
-            b6.setOnClickListener { v -> onClick(v) }
-            b9.setOnClickListener { v -> onClick(v) }
-            b7.setOnClickListener { v -> onClick(v) }
-            b8.setOnClickListener { v -> onClick(v) }
-            b0.setOnClickListener { v -> onClick(v) }
+            b1.setOnClickListener { v -> onNumberClick(v) }
+            b2.setOnClickListener { v -> onNumberClick(v) }
+            b3.setOnClickListener { v -> onNumberClick(v) }
+            b4.setOnClickListener { v -> onNumberClick(v) }
+            b5.setOnClickListener { v -> onNumberClick(v) }
+            b6.setOnClickListener { v -> onNumberClick(v) }
+            b9.setOnClickListener { v -> onNumberClick(v) }
+            b7.setOnClickListener { v -> onNumberClick(v) }
+            b8.setOnClickListener { v -> onNumberClick(v) }
+            b0.setOnClickListener { v -> onNumberClick(v) }
             bc.setOnClickListener { input.text = "" }
             be.setOnClickListener { onEnterPressed() }
             floatingActionButton.setOnClickListener { vm.fetchCommands() }
@@ -49,7 +60,7 @@ class KeypadFragment : Fragment() {
         }
     }
 
-    private fun onClick(v: View) {
+    private fun onNumberClick(v: View) {
         val button: Button = v as Button
         binding.input.text = String.format("%s%s", binding.input.text, button.text)
     }
@@ -67,7 +78,15 @@ class KeypadFragment : Fragment() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return NavigationUI.onNavDestinationSelected(item,
-            view!!.findNavController())
+            requireView().findNavController())
                 || super.onOptionsItemSelected(item)
     }
+
+}
+
+@BindingAdapter("android:clickable")
+fun setClickable(view: View, clickable: Boolean) {
+    val fab: FloatingActionButton = view as FloatingActionButton
+    fab.isClickable = clickable
+    fab.backgroundTintList = ContextCompat.getColorStateList(fab.context, if (clickable) R.color.colorAccent else R.color.colorDark)
 }

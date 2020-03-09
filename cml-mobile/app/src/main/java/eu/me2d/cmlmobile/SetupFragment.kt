@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.activityViewModels
 import eu.me2d.cmlmobile.databinding.FragmentSetupBinding
 
 /**
@@ -14,7 +14,7 @@ import eu.me2d.cmlmobile.databinding.FragmentSetupBinding
  */
 class SetupFragment : Fragment() {
 
-    private lateinit var viewModel: CmlViewModel
+    private val viewModel: CmlViewModel by activityViewModels()
     private lateinit var binding: FragmentSetupBinding
 
     override fun onCreateView(
@@ -22,8 +22,6 @@ class SetupFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val viewModelFactory = CmlViewModelFactory(activity!!.application)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(CmlViewModel::class.java)
         binding = FragmentSetupBinding.inflate(inflater)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this

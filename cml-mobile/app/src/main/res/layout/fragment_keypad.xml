@@ -19,8 +19,9 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
             android:layout_margin="16dp"
-            android:clickable="true"
-            android:src="@android:drawable/ic_popup_sync" />
+            android:clickable="@{viewModel.paired}"
+            android:src="@android:drawable/ic_popup_sync"
+             />
 
         <LinearLayout
             android:layout_width="match_parent"

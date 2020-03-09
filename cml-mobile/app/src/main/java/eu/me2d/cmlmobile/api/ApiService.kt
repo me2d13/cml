@@ -43,7 +43,7 @@ class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
                 response: Response<PublicKeyResponse>
             ) {
                 if (response.isSuccessful) {
-                    result.value = "OK ${response.body()?.message}"
+                    result.value = "OK"
                 } else {
                     result.value = "${response.code()} ${response.message()}"
                 }
@@ -78,7 +78,10 @@ class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
         }
     }
 
-    fun fetchCommands(commands: MutableLiveData<List<Command>>) {
+    fun fetchCommands(
+        commands: MutableLiveData<List<Command>>,
+        toastCode: MutableLiveData<Int>
+    ) {
         val jws = Jwts.builder()
             .setSubject("Commands")
             .setId(Date().time.toString())
@@ -92,6 +95,7 @@ class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
             }
 
             override fun onResponse(call: Call<List<Command>>, response: Response<List<Command>>) {
+                toastCode.value = response.code()
                 if (response.isSuccessful) {
                     Timber.d("Fetched %d commands", response.body()?.size)
                     commands.value = response.body()
