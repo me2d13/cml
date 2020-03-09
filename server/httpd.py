@@ -21,9 +21,22 @@ class CommandsApi(object):
 
     @cherrypy.tools.json_out()
     def GET(self):
-        self.sec.registered_client(cherrypy.request)
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
-        return self.broker.get_commands()
+        if self.sec.is_public_access:
+            client = self.sec.find_client(cherrypy.request)
+            if client:
+                if client.get('all_commands'):
+                    return self.broker.get_commands()
+                else:
+                    allowed = set(client.get('commands', []))
+                    all_commands = self.broker.get_commands()
+                    logger.debug(all_commands)
+                    return [com for com in all_commands if com['number'] in allowed]
+            else:
+                logger.debug("Client not found")
+                return []
+        else:
+            return self.broker.get_commands()
 
     @cherrypy.tools.json_out()
     def POST(self, number):
@@ -60,7 +73,6 @@ class ClientsApi(object):
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
     def POST(self):
-        self.sec.only_internal(cherrypy.request)
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         data = cherrypy.request.json
         clients.register_client(data.get('key'), data.get('message'))

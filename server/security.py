@@ -66,11 +66,11 @@ class Security:
         return False
 
     def only_internal(self, request):
-        if request.base.endswith(str(config.HTTPD_PUBLIC_PORT)):
+        if self.is_public_access(request):
             raise cherrypy.HTTPError(403)
 
     def command(self, request, number):
-        if request.base.endswith(str(config.HTTPD_PUBLIC_PORT)):
+        if self.is_public_access(request):
             client = self.find_client(request)
             if client:
                 if client.get('all_commands'):
