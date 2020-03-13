@@ -33,3 +33,11 @@
   color: gray;
   margin-left: 10px;
 }
+
+.actionCell {
+  display: flex;
+}
+
+.actionCell button {
+  margin-left: 5px;
+}
