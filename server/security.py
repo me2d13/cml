@@ -12,7 +12,7 @@ class Security:
         self.last_jtis = {} # dictionary client id => last used jti. Maybe convert to list to be more secure
 
     def is_public_access(self, request):
-        logger.debug("Access from request.base %s with headers %s", request.base, request.headers)
+        #logger.debug("Access from request.base %s with headers %s", request.base, request.headers)
         on_port = request.base.endswith(str(config.HTTPD_PUBLIC_PORT))
         on_custom_heaer = request.headers.get('X-Cml-Public') == "True"
         return on_port or on_custom_heaer

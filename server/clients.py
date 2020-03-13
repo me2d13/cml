@@ -6,6 +6,7 @@ import datetime
 
 logger = log.create_logger(__name__)
 
+fields_allowed_to_update = ['commands', 'message', 'approved', 'all_commands']
 
 def register_client(key, message):
     logger.debug('Registering cient with note %s', message)
@@ -23,11 +24,12 @@ def register_client(key, message):
 
 def enrich_with(origin, updater):
     res = {}
-    for k, v in origin.items():
-        if k in updater:
+    fields_to_process = set(origin.keys()) | (set(updater.keys()) & set(fields_allowed_to_update))
+    for k in fields_to_process:
+        if k in updater and k in fields_allowed_to_update:
             res[k] = updater[k]
         else:
-            res[k] = v
+            res[k] = origin[k]
     return res
 
 def update_client(id, data):

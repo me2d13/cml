@@ -13,6 +13,12 @@ import security
 
 logger = log.create_logger(__name__)
 
+def CORS():
+    cherrypy.response.headers["Access-Control-Allow-Origin"] = "*"
+    if cherrypy.request.method == "OPTIONS":
+        cherrypy.response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PATCH, PUT, DELETE, OPTIONS'
+        cherrypy.response.headers["Access-Control-Allow-Headers"] = "X-Mobile, Authorization, Origin, X-Requested-With, Content-Type, Accept"
+
 @cherrypy.expose
 class CommandsApi(object):
     def __init__(self, broker, securityObject):
@@ -21,8 +27,7 @@ class CommandsApi(object):
 
     @cherrypy.tools.json_out()
     def GET(self):
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
-        if self.sec.is_public_access:
+        if self.sec.is_public_access(cherrypy.request):
             client = self.sec.find_client(cherrypy.request)
             if client:
                 if client.get('all_commands'):
@@ -41,7 +46,6 @@ class CommandsApi(object):
     @cherrypy.tools.json_out()
     def POST(self, number):
         self.sec.command(cherrypy.request, number)
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         path_pattern = re.compile("([0-9]+)")
         match = path_pattern.match(number)
         if match:
@@ -73,7 +77,6 @@ class ClientsApi(object):
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
     def POST(self):
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         data = cherrypy.request.json
         clients.register_client(data.get('key'), data.get('message'))
         return {'status': 'ok'}
@@ -81,24 +84,24 @@ class ClientsApi(object):
     @cherrypy.tools.json_out()
     def GET(self):
         self.sec.only_internal(cherrypy.request)
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return clients.get_clients()
 
     @cherrypy.tools.json_out()
     @cherrypy.tools.json_in()
     def PUT(self, id):
         self.sec.only_internal(cherrypy.request)
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         return clients.update_client(id, cherrypy.request.json)
 
     @cherrypy.tools.json_out()
     def DELETE(self, id):
         self.sec.only_internal(cherrypy.request)
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         if clients.delete_client(id):
             return {'status': 'ok'}
         else:
             return {'status': 'ko'}
+
+    def OPTIONS(self, id):
+        return None
 
     def _cp_dispatch(self, vpath):
         if len(vpath) == 1:
@@ -108,14 +111,18 @@ class ClientsApi(object):
 
 
 conf = {
-        '/': {'request.dispatch':  cherrypy.dispatch.MethodDispatcher(),
+        '/': {
                  'tools.sessions.on': False,
                  'tools.response_headers.on': True,
-                 'tools.response_headers.headers': [('Content-Type', 'application/json')]}
-            }
+                 'tools.response_headers.headers': [('Content-Type', 'application/json'), ('Access-Control-Allow-Origin', '*')],
+                 'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+                 'tools.CORS.on': True
+              }
+        }
 
 def start_httpd(broker, client):
     securityObject = security.Security()
+    cherrypy.tools.CORS = cherrypy.Tool('before_handler', CORS)
     cherrypy.tree.mount(CommandsApi(broker, securityObject), '/commands', conf)
     server = Server()
     server.socket_port = config.HTTPD_PUBLIC_PORT
