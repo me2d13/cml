@@ -17,17 +17,22 @@ class KeypadService:
         self.loop.create_task(self.keypad.scan_coro())
         self.loop.create_task(self.keypad_watcher())
         self.blinking_id = 0
+        self.watchdog = None
 
     def clear_command(self):
         self.command = ''
         self.led_service.stop_blinking(self.blinking_id)
         self.blinking_id = 0
 
+    def add_watchdog(self, watchdog):
+        self.watchdog = watchdog
 
     async def keypad_watcher(self):
         while True:
             key = await self.keypad.get_key()
             #print("Got key:", key)
+            if self.watchdog:
+                self.watchdog.kick()
             if key == '*':
                 beep.beep(1, 50)
                 self.clear_command()

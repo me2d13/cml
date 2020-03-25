@@ -10,6 +10,7 @@ import uasyncio as asyncio
 import led
 import mqtt
 import keypad
+import watchdog
 
 gc.collect()
 
@@ -18,6 +19,8 @@ p2 = Pin(2, Pin.OUT)
 led_service = led.LedService()
 mqtt_service = mqtt.MqttService()
 keypad_service = keypad.KeypadService(led_service, mqtt_service)
+watchdog = watchdog.Watchdog(keypad_service)
+keypad_service.add_watchdog(watchdog)
 
 async def connect():
   connecting_blink = led_service.start_blinking(led.BlinkDef(1,0,0,1,200, 500, 50, 10))
@@ -25,7 +28,7 @@ async def connect():
   led_service.stop_blinking(connecting_blink)
 
 async def killer():
-    await asyncio.sleep(10)
+    await asyncio.sleep(30)
 
 loop = asyncio.get_event_loop()
 loop.create_task(connect())
