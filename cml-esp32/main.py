@@ -20,10 +20,9 @@ mqtt_service = mqtt.MqttService()
 keypad_service = keypad.KeypadService(led_service, mqtt_service)
 
 async def connect():
-  led_service.set_rgb(1,0,0)
-  led_service.start_blinking(1, 200, 500)
+  connecting_blink = led_service.start_blinking(led.BlinkDef(1,0,0,1,200, 500, 50, 10))
   await mqtt_service.connect()
-  led_service.stop_blinking()
+  led_service.stop_blinking(connecting_blink)
 
 async def killer():
     await asyncio.sleep(10)
