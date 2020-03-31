@@ -4,6 +4,7 @@ import micropython
 from machine import Pin
 import uasyncio as asyncio
 from uasyncio.queues import Queue
+import env
 
 QUEUE_SIZE_DEFAULT = 5
 LONG_KEYPRESS_COUNT_DEFAULT = 20
@@ -47,11 +48,11 @@ class Keypad_uasyncio():
         self.keys = [ { 'char':key, 'state':self.KEY_UP, 'down_count':0 } for key in keys ]
 
         ## Pin names for rows and columns.
-        self.rows = [ 12, 33, 25, 27 ]
-        self.cols = [ 14, 13, 26 ]
+        self.rows = env.KEYPAD_ROW_PINS
+        self.cols = env.KEYPAD_COL_PINS
 
         ## Initialise row pins as outputs.
-        self.row_pins = [ Pin(pin_name, mode=Pin.OUT) for pin_name in self.rows ]
+        self.row_pins = [ Pin(pin_name, mode=Pin.OUT, pull=None) for pin_name in self.rows ]
 
         ## Initialise column pins as inputs.
         self.col_pins = [ Pin(pin_name, mode=Pin.IN, pull=Pin.PULL_DOWN) for pin_name in self.cols ]
@@ -67,6 +68,8 @@ class Keypad_uasyncio():
 
     def stop(self):
         self.running = False
+        for _, row_pin in enumerate(self.row_pins):
+            row_pin.value(1) # prepare rows up and to cols wake up from deep sleep
 
     #-------------------------------------------------------------------------
 

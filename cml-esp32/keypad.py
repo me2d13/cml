@@ -1,6 +1,6 @@
 import env
 from machine import Pin, PWM
-import micropython
+import esp32
 import uasyncio as asyncio
 import keypad_uasyncio
 import beep
@@ -51,4 +51,8 @@ class KeypadService:
                 else:
                     self.blinking_id = self.led_service.start_blinking(b_def)
 
-
+    def prepare_deep_sleep(self):
+        self.keypad.stop()
+        for pin in env.KEYPAD_ROW_PINS:
+            Pin(pin, mode=Pin.OUT, pull=Pin.PULL_HOLD)
+        esp32.wake_on_ext1(pins = self.keypad.col_pins, level = esp32.WAKEUP_ANY_HIGH)

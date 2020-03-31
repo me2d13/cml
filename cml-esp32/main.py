@@ -28,10 +28,16 @@ async def connect():
   led_service.stop_blinking(connecting_blink)
 
 async def killer():
-    await asyncio.sleep(30)
+  await asyncio.sleep(20)
+
+async def heart_beat():
+  for _ in range(10): # 10 blicks on start
+    p2.on()
+    await asyncio.sleep_ms(100)
+    p2.off()
+    await asyncio.sleep_ms(700)
 
 loop = asyncio.get_event_loop()
 loop.create_task(connect())
-loop.run_until_complete(killer())  # Run for 10s
-#loop.run_forever()
-#loop.close()
+loop.create_task(heart_beat())
+loop.run_forever()
