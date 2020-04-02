@@ -40,4 +40,24 @@ class CmlAbstractCommand:
     def light_pct(self, dp_no, percent):
         topic = '/xcfgw/lr/command/{}'.format(dp_no)
         payload = '{"event": 13, "data":64, "percent": %d}' % percent
-        self.mqtt_client.publish(topic, payload)        
+        self.mqtt_client.publish(topic, payload)
+
+JALO_DOWN = 0
+JALO_UP = 1
+JALO_STOP = 2
+
+class JaloCommand(CmlAbstractCommand):
+    def __init__(self, command_number, description, dp_no, jalo_command):
+        super().__init__(command_number)
+        self.description = description
+        self.dp_no = dp_no
+        self.jalo_command = jalo_command
+
+    def describe(self):
+        return self.description
+
+    def run(self, interrupt_event):
+        topic = '/xcfgw/lr/command/{}'.format(self.dp_no)
+        payload = '{"event": 14, "data": %d}' % self.jalo_command
+        self.logger.debug('Sending mqtt message topic %s payload %s', topic, payload)
+        self.mqtt_client.publish(topic, payload)
