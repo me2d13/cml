@@ -10,12 +10,15 @@ import httpd
 # pip install cherrypy
 # pip install PyJWT
 # pip install pyjwt[crypto]
+# pip install python-elastic-logstash
 
 
 logger = log.create_logger(__name__)
+es_logger = log.create_es_logger('CMLmain')
 
 def main():
     logger.debug('CML server starting...')
+    es_logger.info("CML server starting...")
 
     command_broker = broker.Broker()
 

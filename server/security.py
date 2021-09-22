@@ -74,12 +74,12 @@ class Security:
             client = self.find_client(request)
             if client:
                 if client.get('all_commands'):
-                    return True
+                    return client
                 logger.debug("Commands are %s", str(client.get('commands', [])))
                 if int(number) in client.get('commands', []):
-                    return True
+                    return client
                 raise cherrypy.HTTPError(403, message="Forbidden command")
             raise cherrypy.HTTPError(401)
         else:
-            return True # internal network
+            return None # internal network
 

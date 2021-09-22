@@ -9,7 +9,9 @@ WORKDIR /usr/src/app
 
 RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi libffi-dev openssl-dev
 
-RUN pip install --no-cache-dir paho-mqtt cherrypy PyJWT cryptography
+RUN pip install --upgrade pip
+
+RUN pip install --no-cache-dir paho-mqtt cherrypy PyJWT cryptography elasticsearch requests python-elastic-logstash
 
 RUN apk del .build-deps gcc musl-dev libffi libffi-dev openssl-dev
 

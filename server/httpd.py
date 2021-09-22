@@ -12,6 +12,7 @@ import jwt
 import security
 
 logger = log.create_logger(__name__)
+es_logger = log.create_es_logger('CMLserver')
 
 def CORS():
     cherrypy.response.headers["Access-Control-Allow-Origin"] = "*"
@@ -45,7 +46,8 @@ class CommandsApi(object):
 
     @cherrypy.tools.json_out()
     def POST(self, number):
-        self.sec.command(cherrypy.request, number)
+        es_logger.debug("Incoming command request for {}".format(number))
+        client = self.sec.command(cherrypy.request, number)
         path_pattern = re.compile("([0-9]+)")
         match = path_pattern.match(number)
         if match:
@@ -53,6 +55,7 @@ class CommandsApi(object):
             logger.debug("Recognized httpd command %s", command)
             try:
                 logger.debug("Executing command %s", command)
+                es_logger.debug("Executing command {} by client {}".format(command, client.get('message', '?') if client is not None else "internal"))
                 self.broker.on_command(command)
                 result = 'Command executed'
             except:
