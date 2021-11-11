@@ -3,7 +3,7 @@
 import micropython
 from machine import Pin
 import uasyncio as asyncio
-from uasyncio.queues import Queue
+from primitives.queue import Queue
 import env
 
 QUEUE_SIZE_DEFAULT = 5

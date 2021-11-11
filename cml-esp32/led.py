@@ -18,6 +18,7 @@ class LedService:
         self.p_red = Pin(env.PIN_NO_RED, Pin.OUT)
         self.p_green = Pin(env.PIN_NO_GREEN, Pin.OUT)
         self.p_blue = Pin(env.PIN_NO_BLUE, Pin.OUT)
+        self.off()
         #p_red = PWM(Pin(env.PIN_NO_RED, Pin.OUT), freq=1000)
         #p_green = PWM(Pin(env.PIN_NO_GREEN, Pin.OUT), freq=1000)
         #p_blue = PWM(Pin(env.PIN_NO_BLUE, Pin.OUT), freq=1000)
@@ -91,6 +92,11 @@ class LedService:
 
         self.blinking_defs.pop(id, {})
         self.pick_and_start_blinking()
+
+    def prepare_deep_sleep(self):
+        Pin(env.PIN_NO_RED, Pin.IN, Pin.PULL_UP)
+        Pin(env.PIN_NO_GREEN, Pin.IN, Pin.PULL_UP)
+        Pin(env.PIN_NO_BLUE, Pin.IN, Pin.PULL_UP)
 
     async def blinking_watcher(self):
         """The coro handling LED (turning on and off) for continuos blinking based on active definition"""

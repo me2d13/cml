@@ -15,9 +15,9 @@ class MqttService:
         print('MqttService: Client created')
 
     async def connect(self):
-        print('MqttService: Going to connect')
+        print('MqttService: Going to connect to '+ config['ssid'])
         await self.client.connect()
-        print('MqttService: Was connected')
+        print('MqttService: Was connected as ' + self.client._sta_if.ifconfig()[0])
 
 
     def callback(self, topic, msg, retained):
@@ -25,6 +25,7 @@ class MqttService:
 
     async def conn_han(self, client):
         print('MqttService: MQTT connected')
+        await self.client.publish(env.LOG_TOPIC, 'CML ESP32 connected with IP ' + self.client._sta_if.ifconfig()[0], qos = 1)
         #await client.subscribe('foo_topic', 1)
         while len(self.pending_messages) > 0:
             topic, msg = self.pending_messages[0]

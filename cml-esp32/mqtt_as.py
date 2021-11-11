@@ -510,17 +510,18 @@ class MQTTClient(MQTT_base):
                         break
             else:
                 while s.status() == network.STAT_CONNECTING:  # Break out on fail or success. Check once per sec.
+                    self.dprint('Wifi connecting, status ' + str(s.status()))
                     await asyncio.sleep(1)
 
         if not s.isconnected():
             raise OSError
         # Ensure connection stays up for a few secs.
         self.dprint('Checking WiFi integrity.')
-        for _ in range(5):
+        for _ in range(2):
             if not s.isconnected():
                 raise OSError  # in 1st 5 secs
             await asyncio.sleep(1)
-        self.dprint('Got reliable connection')
+        self.dprint('Got reliable connection with IP ' + s.ifconfig()[0])
 
     async def connect(self):
         if not self._has_connected:

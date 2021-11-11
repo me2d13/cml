@@ -1,5 +1,5 @@
 import env
-from machine import Pin, PWM
+from machine import Pin, PWM, reset
 import esp32
 import uasyncio as asyncio
 import keypad_uasyncio
@@ -37,9 +37,19 @@ class KeypadService:
                 beep.beep(1, 50)
                 self.clear_command()
             elif key == '#':
-                print("Sending:", self.command)
-                beep.beep(2)
-                await self.mqtt_service.publish(env.MQTT_TOPIC + self.command, '')
+                if self.command == '380':
+                    print("Starting FTP server")
+                    await self.mqtt_service.publish(env.LOG_TOPIC, 'Starting FTP server')
+                    #await self.mqtt_service.client.disconnect()
+                    import ftp
+                    ftp.ftpserver()
+                elif self.command == '73738':
+                    print("Resetting...")
+                    reset()
+                else:
+                    print("Sending:", self.command)
+                    beep.beep(2)
+                    await self.mqtt_service.publish(env.MQTT_TOPIC + self.command, '')
                 self.clear_command()
             else:
                 self.command = self.command + key
