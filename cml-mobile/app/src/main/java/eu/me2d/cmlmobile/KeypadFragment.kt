@@ -10,7 +10,6 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import androidx.navigation.findNavController
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -30,7 +29,7 @@ class KeypadFragment : Fragment() {
         // Inflate the layout for this fragment
         binding.viewModel = vm
         binding.lifecycleOwner = this
-        vm.toastCode.observe(viewLifecycleOwner, Observer<Int> {
+        vm.toastCode.observe(viewLifecycleOwner, {
             if (it == 403) {
                 Toast.makeText(this.context, R.string.not_yet_approved, Toast.LENGTH_SHORT).show()
             } else if ( it != 200) {
