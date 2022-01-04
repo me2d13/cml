@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
 import eu.me2d.cmlmobile.CmlViewModel
 import eu.me2d.cmlmobile.R
+import eu.me2d.cmlmobile.api.Command
 
 /**
  * A fragment representing a list of Items.
@@ -41,18 +42,16 @@ class CommandsListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyCommandRecyclerViewAdapter(vm.commands.value ?: emptyList(), vm)
+                val commands = vm.commands.value ?: emptyList()
+                adapter = MyCommandRecyclerViewAdapter(vm)
             }
         }
         return view
     }
 
     companion object {
-
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
 
-        // TODO: Customize parameter initialization
         @JvmStatic
         fun newInstance(columnCount: Int) =
             CommandsListFragment().apply {

@@ -9,14 +9,11 @@ import eu.me2d.cmlmobile.api.Command
 import eu.me2d.cmlmobile.databinding.FragmentItemBinding
 import timber.log.Timber
 
-/**
- * [RecyclerView.Adapter] that can display a [PlaceholderItem].
- * TODO: Replace the implementation with code for your data type.
- */
 class MyCommandRecyclerViewAdapter(
-    private val values: List<Command>,
     private val vm: CmlViewModel
 ) : RecyclerView.Adapter<MyCommandRecyclerViewAdapter.ViewHolder>() {
+
+    private val values = vm.historyService.sortCommands(vm.commands.value ?: emptyList())
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
 

@@ -9,4 +9,6 @@
     <string name="send">Send</string>
     <string name="note">Note</string>
     <string name="not_yet_approved">Pairing request not yet approved</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

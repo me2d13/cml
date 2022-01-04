@@ -3,20 +3,28 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/keypadFragment">
+    app:startDestination="@id/mainFragment">
 
-    <fragment
-        android:id="@+id/keypadFragment"
-        android:name="eu.me2d.cmlmobile.KeypadFragment"
-        android:label="fragment_keypad"
-        tools:layout="@layout/fragment_keypad" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="eu.me2d.cmlmobile.SettingsFragment"
-        android:label="SettingsFragment" />
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_setupFragment"
+            app:destination="@id/setupFragment" />
+    </fragment>
     <fragment
         android:id="@+id/setupFragment"
         android:name="eu.me2d.cmlmobile.SetupFragment"
         android:label="fragment_setup"
         tools:layout="@layout/fragment_setup" />
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="eu.me2d.cmlmobile.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main" >
+        <action
+            android:id="@+id/action_mainFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
+    </fragment>
 </navigation>

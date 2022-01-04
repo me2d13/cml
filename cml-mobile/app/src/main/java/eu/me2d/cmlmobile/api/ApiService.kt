@@ -14,6 +14,7 @@ import java.security.PrivateKey
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.*
+import java.util.function.Consumer
 import javax.net.ssl.*
 
 
@@ -80,7 +81,8 @@ class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
 
     fun fetchCommands(
         commands: MutableLiveData<List<Command>>,
-        toastCode: MutableLiveData<Int>
+        toastCode: MutableLiveData<Int>,
+        onSuccess: Consumer<List<Command>>
     ) {
         val jws = Jwts.builder()
             .setSubject("Commands")
@@ -98,7 +100,11 @@ class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
                 toastCode.value = response.code()
                 if (response.isSuccessful) {
                     Timber.d("Fetched %d commands", response.body()?.size)
-                    commands.value = response.body()
+                    val commandsResponse = response.body()
+                    if (commandsResponse != null) {
+                        commands.value = commandsResponse
+                        onSuccess.accept(commandsResponse)
+                    }
                 } else {
                     Timber.e("${response.code()} ${response.message()}")
                     commands.value = Collections.emptyList()

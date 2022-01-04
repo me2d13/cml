@@ -3,7 +3,6 @@ package eu.me2d.cmlmobile
 import android.app.Application
 import android.util.Base64
 import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
 import eu.me2d.cmlmobile.api.ApiService
 import eu.me2d.cmlmobile.api.Command
 import org.threeten.bp.LocalDateTime
@@ -18,6 +17,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
 
     private lateinit var apiService: ApiService
     private var persistenceService = PersistenceService(application)
+    var historyService = HistoryService()
 
     val url: MutableLiveData<String>
     val note: MutableLiveData<String> = MutableLiveData("")
@@ -37,6 +37,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val storedData = persistenceService.loadAll()
+        historyService.initHistory(storedData.history)
         commands.value = storedData.commands
         url = MutableLiveData(storedData.url)
         sentDate = MutableLiveData<LocalDateTime>(storedData.sent)
@@ -59,7 +60,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
         if (!url.value.isNullOrEmpty() && privateKey != null) {
             apiService = ApiService(url.value!!, privateKey!!)
         }
-        paired = MediatorLiveData<Boolean>()
+        paired = MediatorLiveData()
         paired.addSource(url) { paired.value = haveInfoForApiCalls() }
         paired.addSource(sentDate) { paired.value = haveInfoForApiCalls() }
         currentTab = storedData.currentTab
@@ -87,7 +88,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
 
     fun fetchCommands() {
         if (haveInfoForApiCalls()) {
-            apiService.fetchCommands(commands, toastCode)
+            apiService.fetchCommands(commands, toastCode) { saveToSharedPrefs() }
         } else {
             Timber.w("Can't fetch commands, register client first")
         }
@@ -96,6 +97,8 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
     fun executeCommand(number: Number) {
         if (haveInfoForApiCalls()) {
             apiService.executeCommand(number)
+            historyService.commandExecuted(number.toInt())
+            persistenceService.saveHistory(historyService.historyForLastNDays(10))
         } else {
             Timber.w("Can't execute command, register client first")
         }
@@ -115,6 +118,7 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
                 ),
                 currentTab = currentTab,
                 commands = commands.value ?: emptyList(),
+                history = historyService.historyForLastNDays(10)
             )
         )
     }
