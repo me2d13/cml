@@ -42,7 +42,6 @@ class CommandsListFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                val commands = vm.commands.value ?: emptyList()
                 adapter = MyCommandRecyclerViewAdapter(vm)
             }
         }

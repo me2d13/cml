@@ -1,11 +1,11 @@
 package eu.me2d.cmlmobile.list
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import eu.me2d.cmlmobile.CmlViewModel
-import eu.me2d.cmlmobile.api.Command
 import eu.me2d.cmlmobile.databinding.FragmentItemBinding
 import timber.log.Timber
 
@@ -34,6 +34,9 @@ class MyCommandRecyclerViewAdapter(
         holder.wrapper.setOnClickListener {
             Timber.d("Click on number %d", item.number)
             vm.executeCommand(item.number)
+        }
+        if (position % 2 == 0) {
+            holder.wrapper.setBackgroundColor(Color.rgb(240, 240, 240))
         }
     }
 
