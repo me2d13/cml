@@ -1,5 +1,6 @@
 package eu.me2d.cmlmobile.api
 
+import android.util.Base64
 import androidx.lifecycle.MutableLiveData
 import io.jsonwebtoken.Jwts
 import okhttp3.OkHttpClient
@@ -10,16 +11,25 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import timber.log.Timber
+import java.security.KeyFactory
 import java.security.PrivateKey
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
+import java.security.spec.PKCS8EncodedKeySpec
 import java.util.*
 import java.util.function.Consumer
 import javax.net.ssl.*
 
+fun parseKey(privateKey: String): PrivateKey {
+    val decodedKey = Base64.decode(privateKey, Base64.DEFAULT)
+    val kf: KeyFactory = KeyFactory.getInstance("RSA")
+    return kf.generatePrivate(PKCS8EncodedKeySpec(decodedKey))
+}
 
 //TODO: convert to Dagger singleton
 class ApiService(baseUrl: String, private val privateKey: PrivateKey) {
+    constructor(baseUrl: String, privateKey: String) : this(baseUrl, parseKey(privateKey))
+
     private val retrofitService = Retrofit.Builder()
         .baseUrl(if (baseUrl.endsWith('/')) baseUrl else "$baseUrl/")
         .addConverterFactory(GsonConverterFactory.create())

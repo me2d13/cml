@@ -1,6 +1,6 @@
 package eu.me2d.cmlmobile
 
-import android.app.Application
+import android.content.Context
 import androidx.preference.PreferenceManager
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -8,7 +8,7 @@ import eu.me2d.cmlmobile.api.Command
 import org.threeten.bp.LocalDateTime
 import timber.log.Timber
 
-class PersistenceService(private val application: Application) {
+class PersistenceService(private val context: Context) {
 
     companion object Keys {
         const val KEY_SERVER_URL = "serverUrl"
@@ -19,7 +19,7 @@ class PersistenceService(private val application: Application) {
         const val KEY_HISTORY = "history"
     }
 
-    private val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(application)
+    private val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
     private val gson = Gson()
 
     fun loadAll(): PersistedData {
@@ -39,7 +39,7 @@ class PersistenceService(private val application: Application) {
     }
 
     fun saveAll(data: PersistedData) {
-        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(application)
+        val sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context)
         with (sharedPrefs.edit()) {
             putString(KEY_SERVER_URL, data.url)
             if (data.sent != null) {
