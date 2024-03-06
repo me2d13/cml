@@ -10,13 +10,13 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
-    compileSdkVersion 31
+    compileSdkVersion 33
     defaultConfig {
         applicationId "eu.me2d.cmlmobile"
         minSdkVersion 24
-        targetSdkVersion 31
-        versionCode 11000
-        versionName "1.1.0"
+        targetSdkVersion 33
+        versionCode 11010
+        versionName "1.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
