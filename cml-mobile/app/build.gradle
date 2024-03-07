@@ -15,8 +15,8 @@ android {
         applicationId "eu.me2d.cmlmobile"
         minSdkVersion 24
         targetSdkVersion 33
-        versionCode 11010
-        versionName "1.1.1"
+        versionCode 11020
+        versionName "1.1.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

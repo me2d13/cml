@@ -24,7 +24,7 @@ class MainCmlCarScreen(
     @SuppressLint("RestrictedApi")
     private fun newResetThread(): Thread {
         return Thread {
-            Thread.sleep(1000)
+            Thread.sleep(3000)
             loadedCommandNo = null
             Timber.d("Active command timed out")
             ThreadUtils.runOnMain {

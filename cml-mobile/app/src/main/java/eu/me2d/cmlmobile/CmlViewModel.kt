@@ -58,7 +58,11 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
             privateKey = kf.generatePrivate(PKCS8EncodedKeySpec(decodedKey))
         }
         if (!url.value.isNullOrEmpty() && privateKey != null) {
-            apiService = ApiService(url.value!!, privateKey!!)
+            try {
+                apiService = ApiService(url.value!!, privateKey!!)
+            } catch (e: RuntimeException) {
+                Timber.e(e, "Error creating API service")
+            }
         }
         paired = MediatorLiveData()
         paired.addSource(url) { paired.value = haveInfoForApiCalls() }
@@ -81,8 +85,13 @@ class CmlViewModel(application: Application) : AndroidViewModel(application) {
         sentDate.value = LocalDateTime.now()
         saveToSharedPrefs()
         if (url.value != null && privateKey != null) {
-            apiService = ApiService(url.value!!, privateKey!!)
-            apiService.register(publicKeyStr, note.value, sentResult)
+            try {
+                apiService = ApiService(url.value!!, privateKey!!)
+                apiService.register(publicKeyStr, note.value, sentResult)
+            } catch (e: RuntimeException) {
+                Timber.e(e, "Error sending register request")
+                sentResult.value = "Error: ${e.message}"
+            }
         }
     }
 
