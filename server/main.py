@@ -14,7 +14,7 @@ import httpd
 
 
 logger = log.create_logger(__name__)
-es_logger = log.create_es_logger('CMLmain')
+es_logger = logger
 
 def main():
     logger.debug('CML server starting...')

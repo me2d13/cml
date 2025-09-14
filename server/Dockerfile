@@ -1,7 +1,10 @@
 FROM python:3-alpine
 
 #build with
-# docker build -t me2d.eu/cml:1.1 .
+# docker build -t me2d.eu/cml:1.3 .
+# docker tag me2d.eu/cml:1.3 registry.gitlab.com/me2d/home/cml:1.3
+# docker push registry.gitlab.com/me2d/home/cml:1.3
+
 
 LABEL maintainer="me2d@me2d.eu"
 

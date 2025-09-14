@@ -12,7 +12,7 @@ import jwt
 import security
 
 logger = log.create_logger(__name__)
-es_logger = log.create_es_logger('CMLserver')
+es_logger = logger
 
 def CORS():
     cherrypy.response.headers["Access-Control-Allow-Origin"] = "*"
